@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sys/stat.h>
+
+class User {
+    std::string _name;
+    std::string _login;
+    std::string _pass;
+
+public:
+    // Конструктор класса User
+    User(const std::string& name, const std::string& login, const std::string& pass)
+        : _name(name), _login(login), _pass(pass) {}
+
+    // Функция сохранения состояния объекта User в файл
+    void saveStateToFile(const std::string& filename) {
+        std::ofstream file(filename, std::ios::out | std::ios::binary);
+        if (!file) {
+            std::cerr << "Error opening file: " << filename << std::endl;
+            return;
+        }
+
+        // Записываем данные объекта User в файл
+        file.write(reinterpret_cast<const char*>(this), sizeof(User));
+        file.close();
+
+        // Устанавливаем права доступа на файл (только для текущего пользователя)
+        chmod(filename.c_str(), S_IRUSR | S_IWUSR);
+    }
+};
+
+class Message {
+    std::string _text;
+    std::string _sender;
+    std::string _receiver;
+
+public:
+    // Конструктор класса Message
+    Message(const std::string& text, const std::string& sender, const std::string& receiver)
+        : _text(text), _sender(sender), _receiver(receiver) {}
+
+    // Функция сохранения состояния объекта Message в файл
+    void saveStateToFile(const std::string& filename) {
+        std::ofstream file(filename, std::ios::out | std::ios::binary);
+        if (!file) {
+            std::cerr << "Error opening file: " << filename << std::endl;
+            return;
+        }
+
+        // Записываем данные объекта Message в файл
+        file.write(reinterpret_cast<const char*>(this), sizeof(Message));
+        file.close();
+
+        // Устанавливаем права доступа на файл (только для текущего пользователя)
+        chmod(filename.c_str(), S_IRUSR | S_IWUSR);
+    }
+};
+
+int main() {
+    // Создание и сохранение состояния объекта User
+    User user("John Doe", "johndoe", "password");
+    user.saveStateToFile("user_state.bin");
+
+    // Создание и сохранение состояния объекта Message
+    Message message("Hello!", "johndoe", "janedoe");
+    message.saveStateToFile("message_state.bin");
+
+    return 0;
+}
